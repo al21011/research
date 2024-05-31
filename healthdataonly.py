@@ -10,7 +10,7 @@ import re
 
 # 入出力のファイル名
 srcFile = sys.argv[1]
-dstFile = "xmlDataFile/HeartRate.csv"
+dstFile = "dataFile/HeartRate.csv"
 
 # xmlファイルから必要なデータのみ抽出する
 sFile = open(srcFile, "r")

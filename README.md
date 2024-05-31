@@ -6,7 +6,7 @@
     >>> python extractionXml.py ****.xml
     ここで****.xmlは容量を減らしたいxmlファイルのパスを入力してください
     <2> 書き直したxmlファイルをcsvファイルに変換します
-    >>> python healthdataonly.py ****.xml
+    >>> python healthDataOnly.py ****.xml
     ここで****.xmlは先ほどと同じくファイルのパスです
 
 2.intel realsense d435をpythonで起動する

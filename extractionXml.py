@@ -2,9 +2,9 @@
 ヘルスケアから書き出したxmlファイルが重いので心拍数のみのファイルに書き換えるソースコードです
 '''
 
-# 対象ファイルのパスを入力
+# 対象ファイルのパス
 fileName = "xmlDataFile/export5_28.xml"
-# 必要なデータのRecode type名を入力
+# 必要なデータのRecode type名
 recodeType = r'"HKQuantityTypeIdentifierHeartRate"'
 
 # Recode type名を含む行の抽出

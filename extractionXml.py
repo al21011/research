@@ -1,9 +1,14 @@
 '''
 ヘルスケアから書き出したxmlファイルが重いので心拍数のみのファイルに書き換えるソースコードです
+python extractionXml.py ****.xml
+を実行すると****.xmlファイル内の必要なデータのみを残して削除します
+なお、コマンドライン引数のxmlファイル名はパスを入力してください
 '''
 
+import sys
+
 # 対象ファイルのパス
-fileName = "xmlDataFile/export5_28.xml"
+fileName = sys.argv[1]
 # 必要なデータのRecode type名
 recodeType = r'"HKQuantityTypeIdentifierHeartRate"'
 

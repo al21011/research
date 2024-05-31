@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-applehealthdata.py: Extract data from Apple Health App's export.xml.
+appleHealthData.py: Extract data from Apple Health App's export.xml.
 
 Copyright (c) 2016 Nicholas J. Radcliffe
 Licence: MIT
@@ -238,7 +238,7 @@ class HealthDataExtractor(object):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('USAGE: python applehealthdata.py /path/to/export.xml',
+        print('USAGE: python appleHealthData.py /path/to/export.xml',
               file=sys.stderr)
         sys.exit(1)
     data = HealthDataExtractor(sys.argv[1])

@@ -10,27 +10,36 @@ import re
 
 # 入出力のファイル名
 srcFile = sys.argv[1]
-dstFile = "dataFile/HeartRate.csv"
+dstFile = 'dataFile/HeartRate.csv'
 
 # xmlファイルから必要なデータのみ抽出する
 sFile = open(srcFile, "r")
-dLine = ""
+dList = []
 while True:
     sLine = sFile.readline()
     # workoutで計測したデータを除外しています
     if sLine[1] == '<':
-        # dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[9] + ",")
-        # dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[18] + ",")
-        dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[20].replace(' +0900', '') + ",")
-        # dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[22] + ",")
-        dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[24] + "\n")
+        list1 = re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[20]
+        # list1 = re.sub(r'\W', '', list1).replace(' +0900', '')
+        list2 = re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[24]
+        dList.append([list1, list2])
     else:
         break
+    dList.sort()
 sFile.close()
 
 # csvファイルへ書き込み
-dFile = open(dstFile, "w")
+dFile = open(dstFile, 'w')
 # ヘッダ
-dFile.write("date,value\n")
-dFile.write(dLine)
+dFile.write('date,value')
+cnt = 0
+for listIdx in dList:
+    for idx in listIdx:
+        if(cnt%2 == 0):
+            dFile.write('\n')
+        else:
+            dFile.write(',')
+        dFile.write(idx)
+        cnt += 1
+
 dFile.close()

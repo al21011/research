@@ -19,9 +19,9 @@ while True:
     sLine = sFile.readline()
     if sLine[1] == '<':
         dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[9] + ",")
-        dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[18] + ",")
+        # dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[18] + ",")
         dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[20] + ",")
-        dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[22] + ",")
+        # dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[22] + ",")
         dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[24] + "\n")
     else:
         break
@@ -30,6 +30,6 @@ sFile.close()
 # csvファイルへ書き込み
 dFile = open(dstFile, "w")
 # ヘッダ
-dFile.write("deviceName,creationDate,startDate,endDate,value\n")
+dFile.write("deviceName,date,value\n")
 dFile.write(dLine)
 dFile.close()

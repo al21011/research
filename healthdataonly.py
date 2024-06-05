@@ -17,10 +17,11 @@ sFile = open(srcFile, "r")
 dLine = ""
 while True:
     sLine = sFile.readline()
+    # workoutで計測したデータを除外しています
     if sLine[1] == '<':
-        dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[9] + ",")
+        # dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[9] + ",")
         # dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[18] + ",")
-        dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[20] + ",")
+        dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[20].replace(' +0900', '') + ",")
         # dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[22] + ",")
         dLine += (re.split('name:|creationDate="|startDate="|endDate="|value="|">|"|,', sLine)[24] + "\n")
     else:
@@ -30,6 +31,6 @@ sFile.close()
 # csvファイルへ書き込み
 dFile = open(dstFile, "w")
 # ヘッダ
-dFile.write("deviceName,date,value\n")
+dFile.write("date,value\n")
 dFile.write(dLine)
 dFile.close()

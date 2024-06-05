@@ -1,3 +1,5 @@
+### qiitaから持ってきた深度カメラとしての機能を試すやつです
+
 import pyrealsense2 as rs
 import numpy as np
 import cv2

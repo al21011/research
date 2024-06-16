@@ -7,15 +7,15 @@
 
 <1> extractionXml.pyによってxmlファイルを心拍数のみ抽出して書き直します
 
-　　> python extractionXml.py ****.xml
+> python extractionXml.py ****.xml
 
-    ここで****.xmlは容量を減らしたいxmlファイルのパスを入力してください
+　　ここで****.xmlは容量を減らしたいxmlファイルのパスを入力してください
 
 <2> 書き直したxmlファイルをcsvファイルに変換します
 
 > python healthDataOnly.py ****.xml
 
-ここで****.xmlは先ほどと同じくファイルのパスです
+　　ここで****.xmlは先ほどと同じくファイルのパスです
 
 
 ### 2.intel realsense d435をpythonで起動する

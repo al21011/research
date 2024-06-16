@@ -35,12 +35,14 @@
 
 ### 3.Intel RealSense D435を用いてまばたき検出と瞳孔径計測を行う
 
-<1> 以下のURLからshape_predictor_68_face_landmarks.dat.bz2をダウンロードしてください
+<1> eye_size.pyを実行してください
+
+    python d435/eye_size.py
+
+<datファイルでエラーが起こった場合>
+
+以下のURLからshape_predictor_68_face_landmarks.dat.bz2をダウンロードしてください
 
 [こちら](http://dlib.net/files/)
 
 解凍して得られるdatファイルはd435内にコピーしてください
-
-<2> eye_size.pyを実行してください
-
-    python d435/eye_size.py

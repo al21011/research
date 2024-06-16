@@ -2,14 +2,14 @@
 ### 1.apple watchで計測したxmlファイルを心拍数のみを抽出してcsvファイルにする場合
 ### 2.intel realsense d435をpythonで起動する
 
-# 本文
+## 本文
 ### 1.apple watchで計測したxmlファイルを心拍数のみを抽出してcsvファイルにする場合
 
 <1> extractionXml.pyによってxmlファイルを心拍数のみ抽出して書き直します
 
-> python extractionXml.py ****.xml
+    > python extractionXml.py ****.xml
 
-ここで****.xmlは容量を減らしたいxmlファイルのパスを入力してください
+    ここで****.xmlは容量を減らしたいxmlファイルのパスを入力してください
 
 <2> 書き直したxmlファイルをcsvファイルに変換します
 

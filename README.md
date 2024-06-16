@@ -7,7 +7,7 @@
 
 <1> extractionXml.pyによってxmlファイルを心拍数のみ抽出して書き直します
 
-    > python extractionXml.py ****.xml
+　　> python extractionXml.py ****.xml
 
     ここで****.xmlは容量を減らしたいxmlファイルのパスを入力してください
 

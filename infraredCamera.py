@@ -1,7 +1,6 @@
 import cv2
 import time
 import numpy as np
-import matplotlib.pyplot as plt
 
 # カメラ設定
 cap = cv2.VideoCapture(0)

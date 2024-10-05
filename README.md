@@ -1,29 +1,23 @@
 ## 目次
-### 1.apple watchで計測したxmlファイルを心拍数のみを抽出してcsvファイルにする場合
-### 2.intel realsense d435を用いてまばたき検出を行う
-### 3.Intel RealSense D435を用いてまばたき検出と瞳孔径計測を行う
+### 1.カメラから瞳孔径を計測する
 
 ## 本文
-### 気が向いたらここ書きます
+### 1.カメラから瞳孔径を計測する
+### 2.Apple Watchを使って心拍数を計測する
 
-<1> extractionXml.pyによってxmlファイルを心拍数のみ抽出して書き直します
+<1> infraredCamera.pyを実行します。
 
-    python extractionXml.py ****.xml
+   python infraredCamera.py
 
-　　ここで****.xmlは容量を減らしたいxmlファイルのパスを入力してください
+    Intel RealSense D435をUSB接続して実行してください。
 
-<2> 書き直したxmlファイルをcsvファイルに変換します
+　　赤外線カメラ起動しない場合はescキーもしくはcontrol + Cを実行して終了させた後にUSBを差し直してください。
 
-    python healthDataOnly.py ****.xml
-
-　　ここで****.xmlは先ほどと同じくファイルのパスです
-
-
-### 2.intel realsense d435を用いてまばたき検出を行う
+### 2.Apple Watchを使って心拍数を計測する
 
 <1> 以下のコードをコマンドプロンプトで入力して必要なファイルをインストールしてください
 
-    pip install pyrealsense2
+   pip install pyrealsense2
     pip install numpy
     pip install opencv-python
 

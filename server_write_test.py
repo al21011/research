@@ -1,6 +1,6 @@
 import requests
 
-url='http://localhost:5000/write'
+url='http://160.16.210.86:5000/'
 
 data = {
     'name': 'ryota',

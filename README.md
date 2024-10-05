@@ -12,9 +12,9 @@
 python infraredCamera.py
 ```
 
-Intel RealSense D435をUSB接続して実行してください。
+    Intel RealSense D435をUSB接続して実行してください。
 
-赤外線カメラ起動しない場合はescキーもしくはcontrol + Cを実行して終了させた後にUSBを差し直してください。
+    赤外線カメラ起動しない場合はescキーもしくはcontrol + Cを実行して終了させた後にUSBを差し直してください。
 
 ### 2.Apple Watchを使って心拍数を計測する
 

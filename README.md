@@ -12,9 +12,9 @@
 python infraredCamera.py
 ```
 
-    Intel RealSense D435をUSB接続して実行してください。
+Intel RealSense D435をUSB接続して実行してください。
 
-    赤外線カメラ起動しない場合はescキーもしくはcontrol + Cを実行して終了させた後にUSBを差し直してください。
+赤外線カメラ起動しない場合はescキーもしくはcontrol + Cを実行して終了させた後にUSBを差し直してください。
 
 ### 2.Apple Watchを使って心拍数を計測する
 
@@ -22,19 +22,19 @@ python infraredCamera.py
 
 <2> GitのContentView.swiftをコピーしてXCodeのHeartRate/HeartRate/ContentViewに貼り付ける。
 
-    続いてGitのWatchContentView.swiftをコピーしてXCodeのHeartRate/HeartRate Watch APP/ContentViewに貼り付ける。
+続いてGitのWatchContentView.swiftをコピーしてXCodeのHeartRate/HeartRate Watch APP/ContentViewに貼り付ける。
 
 <3> HealthKitを利用可能にするためHeartRate(プロジェクトフォルダ)を選択してTARGETSにHeartRateを設定する。
 
-    infoタブを開きkeyの任意の場所で右クリックをしてAdd Rowを選択する。
+infoタブを開きkeyの任意の場所で右クリックをしてAdd Rowを選択する。
 
-    Add Rowするとプルダウンが表示されるので、Privacy - Health Share Usage Description、Privacy - Health Update Usage Description、Privacy - Health Records Usage Descriptionの3つを追加する。
+Add Rowするとプルダウンが表示されるので、Privacy - Health Share Usage Description、Privacy - Health Update Usage Description、Privacy - Health Records Usage Descriptionの3つを追加する。
 
-    追加したkeyのValueのところにfor use healthkitと入力(文字はなんでも良いですが、文字数と文字形式に制限があります)
+追加したkeyのValueのところにfor use healthkitと入力(文字はなんでも良いですが、文字数と文字形式に制限があります)
 
-    <img width="1283" alt="スクリーンショット 2024-10-05 23 46 33" src="https://github.com/user-attachments/assets/7bfc9948-c614-4071-b1ff-3430082f5fbf">
+<img width="1283" alt="スクリーンショット 2024-10-05 23 46 33" src="https://github.com/user-attachments/assets/7bfc9948-c614-4071-b1ff-3430082f5fbf">
 
-    Package Dependenciesに関しては余計なこと(結果的に不必要だったもの)をしただけなので気にしないでください。
+Package Dependenciesに関しては余計なこと(結果的に不必要だったもの)をしただけなので気にしないでください。
 
 <4> macとiPhoneをUSB接続して上部のデバイスを自身のiPhoneに変更します。
 

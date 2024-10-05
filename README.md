@@ -12,8 +12,7 @@
 python infraredCamera.py
 ```
 
-Intel RealSense D435をUSB接続して実行してください。
-
+Intel RealSense D435をUSB接続して実行してください。<br>
 赤外線カメラ起動しない場合はescキーもしくはcontrol + Cを実行して終了させた後にUSBを差し直してください。
 
 ### 2.Apple Watchを使って心拍数を計測する
@@ -30,8 +29,7 @@ Add Rowするとプルダウンが表示されるので、
 * Privacy - Health Update Usage Description
 * Privacy - Health Records Usage Description
 
-の3つを追加する。
-
+の3つを追加する。<br>
 追加したkeyのValueのところにfor use healthkitと入力(文字はなんでも良いですが、文字数と文字形式に制限があります)
 
 <img width="1283" alt="スクリーンショット 2024-10-05 23 46 33" src="https://github.com/user-attachments/assets/7bfc9948-c614-4071-b1ff-3430082f5fbf">
@@ -50,6 +48,5 @@ Package Dependenciesに関しては余計なこと(結果的に不必要だっ�
 
 ### 3.サーバ同期をする
 
-現在コーディング中です。
-
+現在コーディング中です。<br>
 出来上がり次第、更新します。

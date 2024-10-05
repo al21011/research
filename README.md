@@ -21,7 +21,6 @@ Intel RealSense D435をUSB接続して実行してください。
 <1> Xcodeを起動して Create New Project > watchOSタブのAPPを選択してNext > Product NameはHeartRateを記入しBundle IdentiferはWatch APP with New Companion iOS Appを選択してNext
 
 <2> GitのContentView.swiftをコピーしてXCodeのHeartRate/HeartRate/ContentViewに貼り付ける。
-
 続いてGitのWatchContentView.swiftをコピーしてXCodeのHeartRate/HeartRate Watch APP/ContentViewに貼り付ける。
 
 <3> HealthKitを利用可能にするためHeartRate(プロジェクトフォルダ)を選択してTARGETSにHeartRateを設定する。

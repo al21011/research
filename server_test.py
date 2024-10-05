@@ -11,6 +11,7 @@ def write_data():
     data_store.append(data)
     return jsonify({"message": "Data written Successfully", "data": data}), 200
 
+
 # 保存されたデータを確認するエンドポイント
 @app.route('/data', methods=['GET'])
 def get_data():

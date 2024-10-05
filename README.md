@@ -4,6 +4,7 @@
 ## 本文
 ### 1.カメラから瞳孔径を計測する
 ### 2.Apple Watchを使って心拍数を計測する
+### 3.サーバ同期をする
 
 <1> infraredCamera.pyを実行します。
 
@@ -15,28 +16,36 @@
 
 ### 2.Apple Watchを使って心拍数を計測する
 
-<1> 以下のコードをコマンドプロンプトで入力して必要なファイルをインストールしてください
+<1> Xcodeを起動して Create New Project > watchOSタブのAPPを選択してNext > Product NameはHeartRateを記入しBundle IdentiferはWatch APP with New Companion iOS Appを選択してNext
 
-   pip install pyrealsense2
-    pip install numpy
-    pip install opencv-python
+<2> GitのContentView.swiftをコピーしてXCodeのHeartRate/HeartRate/ContentViewに貼り付ける。
 
-たびたびエラーが起こるのでその場合はインストール方法をブラウザ検索するなどしてください
+    続いてGitのWatchContentView.swiftをコピーしてXCodeのHeartRate/HeartRate Watch APP/ContentViewに貼り付ける。
 
-<2> eye_blink_only.pyを実行してください
+<3> HealthKitを利用可能にするためHeartRate(プロジェクトフォルダ)を選択してTARGETSにHeartRateを設定する。
 
-    python d435/eye_blink_only.py
+    infoタブを開きkeyの任意の場所で右クリックをしてAdd Rowを選択する。
 
-### 3.Intel RealSense D435を用いてまばたき検出と瞳孔径計測を行う
+    Add Rowするとプルダウンが表示されるので、Privacy - Health Share Usage Description、Privacy - Health Update Usage Description、Privacy - Health Records Usage Descriptionの3つを追加する。
 
-<1> eye_size.pyを実行してください
+    追加したkeyのValueのところにfor use healthkitと入力(文字はなんでも良いですが、文字数と文字形式に制限があります)
 
-    python d435/eye_size.py
+    <img width="1283" alt="スクリーンショット 2024-10-05 23 46 33" src="https://github.com/user-attachments/assets/7bfc9948-c614-4071-b1ff-3430082f5fbf">
 
-<datファイルでエラーが起こった場合>
+    Package Dependenciesに関しては余計なこと(結果的に不必要だったもの)をしただけなので気にしないでください。
 
-以下のURLからshape_predictor_68_face_landmarks.dat.bz2をダウンロードしてください
+<4> macとiPhoneをUSB接続して上部のデバイスを自身のiPhoneに変更します。
 
-[こちら](http://dlib.net/files/)
+<img width="564" alt="スクリーンショット 2024-10-05 23 51 12" src="https://github.com/user-attachments/assets/82e79ba1-ec32-4409-bc90-6ac434bf0950">
 
-解凍して得られるdatファイルはd435内にコピーしてください
+<5> XCodeの左上に再生ボタンがあるので押します
+
+<6> iPhone側でHeartRateからのHealthKit利用を許可します。
+
+<7> Apple Watchのstart workoutボタンを押せば計測が開始されます。
+
+### 3.サーバ同期をする
+
+現在コーディング中です。
+
+出来上がり次第、更新します。

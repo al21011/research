@@ -25,10 +25,11 @@ Intel RealSense D435をUSB接続して実行してください。
 
 <3> HealthKitを利用可能にするためHeartRate(プロジェクトフォルダ)を選択してTARGETSにHeartRateを設定する。<br>
 infoタブを開きkeyの任意の場所で右クリックをしてAdd Rowを選択する。<br>
-Add Rowするとプルダウンが表示されるので、<br>
-* Privacy - Health Share Usage Description<br>
+Add Rowするとプルダウンが表示されるので、
+* Privacy - Health Share Usage Description
 * Privacy - Health Update Usage Description
-* Privacy - Health Records Usage Description<br>
+* Privacy - Health Records Usage Description
+
 の3つを追加する。
 
 追加したkeyのValueのところにfor use healthkitと入力(文字はなんでも良いですが、文字数と文字形式に制限があります)

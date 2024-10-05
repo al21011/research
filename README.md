@@ -7,7 +7,7 @@
 
 <1> infraredCamera.pyを実行します。
 
-   python infraredCamera.py
+　　　python infraredCamera.py
    
    Intel RealSense D435をUSB接続して実行してください。
 

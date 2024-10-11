@@ -50,7 +50,7 @@ def mariadb_transactions(time, pupil, eyeX, eyeY, blink) -> None:
         # コネクションの終了
         con.commit()
         con.close()
-        print('Connection Succeeded!')
+        print(f'{time}')
     except Exception as e:
         print(f'Error commiting transaction: {e}')
         con.rollback()
@@ -66,7 +66,7 @@ def call_periodically():
     time.sleep(1)
 
 # 変数
-tmp_time = 0
+tmp_time = -1
 blink_flag = 0
 
 while True:
@@ -136,7 +136,7 @@ while True:
 
             
             # データベースへ書き込み
-            if int(now_time.second) - tmp_time >= 1:
+            if (int(now_time.second) - tmp_time >= 1) or (int(now_time.second) - tmp_time < 0):
                 mariadb_transactions(
                     now_time,
                     int(cal_median(pupil)),

@@ -5,6 +5,7 @@ watch側のContentView.swift(デフォルトだと拡張子は隠れています
 
 import SwiftUI
 import HealthKit
+import Combine
 
 struct ContentView: View {
     // healthKit認証関連
@@ -22,7 +23,7 @@ struct ContentView: View {
     @State var dateText = ""
     private let dateFormatter = DateFormatter()
     init() {
-        dateFormatter.dateFormat = "HH:mm:ss"
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         dateFormatter.locale = Locale(identifier: "ja_jp")
     }
     // 心拍数更新処理
@@ -101,7 +102,7 @@ struct ContentView: View {
         workoutSession.stopActivity(with: Date())
     }
 
-    // 状態変化検出時処理(多分処理が足りてない)
+    // 状態変化検出時処理
     func workoutSession(_ workoutSession: HKWorkoutSession, didChangeTo toState: HKWorkoutSessionState, from fromState: HKWorkoutSessionState, date: Date) {
         switch toState {
         case .running:
@@ -136,10 +137,52 @@ struct ContentView: View {
                     self.heartRateLatest = Int(value)
                     // debug
                     print(self.heartRateLatest)
+                    
+                    // データベースにデータを保存するために関数呼び出し
+                    let currentTime = self.dateFormatter.string(from: self.nowDate)
+                    self.saveDataToMariaDB(date: currentTime, heartRate: self.heartRateLatest)
                 }
             }
         } )
         self.healthStore.execute(query)
+    }
+    
+    // データベースにデータを保存する
+    func saveDataToMariaDB (date: String, heartRate: Int) {
+        guard let url = URL(string: "http://160.16.210.86:5000/api/users") else {
+            print("Invalid URL")
+            return
+        }
+        
+        // リクエストのためのデータを設定
+        let body: [String: Any] = [
+            "time": date,
+            "heartRate": heartRate
+        ]
+            
+        // JSONエンコード
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: body) else {
+            print("Failed to encode data")
+            return
+        }
+        
+        // リクエストの作成
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+            
+        // URLSessionでPOSTリクエストを実行
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error in POST request: \(error)")
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Server response: \(httpResponse.statusCode)")
+            }
+        }.resume()
     }
 }
 

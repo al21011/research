@@ -1,70 +1,49 @@
-import mariadb
+'''
+さくらサーバ内でPOSTを行うためのコードです。
+さくらサーバselabディレクトリのbio_mariadb.pyコードにコピペするものです。
+'''
+
+from flask import Flask, request, jsonify
+import MySQLdb
 from datetime import datetime
 
-def test_mariadb_transactions() -> None:
-    try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='bio-db'
-        )
-        cur = con.cursor()
-        
-        # 挿入するデータ
-        time = datetime.now()
-        heartRate = 0
-        pupil = 12
-        eyeX = 30
-        eyeY = 40
-        blink = False
-        
-        # テーブルにデータ挿入
-        insert_query = '''
-        INSERT INTO bio_table (time, pupil, eyeX, eyeY, blink)
-        VALUES (%s, %s, %s, %s, %s)
-        '''
-        # クエリ実行
-        cur.execute(insert_query, (time, pupil, eyeX, eyeY, blink))
-        
-        print('Connection Succeeded!')
-        # コネクションの終了
-        con.commit()
-        con.close()
-    except Exception as e:
-        print(f'Error commiting transaction: {e}')
-        con.rollback()
-        
-test_mariadb_transactions()
+app = Flask(__name__)
 
-'''
-# MariaDBサーバーに接続
-connection = mysql.connector.connect(
-    host='160.16.210.86',
-    port=3307,
-    user='root',
-    database='bio-db',
-    password='selab'
-)
-print("Connected to MariaDB")
+@app.route('/api/users', methods=['POST'])
+def add_user():
+    data = request.get_json()
+    heartRate = data.get('heartRate')
+    time = data.get('time')
+    print(time, heartRate)
+    # SwiftUIのDate型からPythonのdatetime型への変換
+    time = datetime.strptime(time, '%Y-%m-%dT%H:%M:%S')
 
-# カーソルを作成
-cursor = connection.cursor()
+    # データベースに接続してデータを挿入
+    con = MySQLdb.connect(
+        host='localhost',
+        user='root',
+        password='selab',
+        database='bio-db'
+    )
+    cur = con.cursor()
+    
+    # SQLクエリと実行
+    query = '''
+    UPDATE bio_table
+    SET heartRate = %s
+    WHERE time = %s
+    '''
+    cur.execute(query, (heartRate, time))
+    # コミット
+    con.commit()
+    # 終了処理
+    cur.close()
+    con.close()
+    
+    return jsonify({'message': 'User added successfully'}), 201
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
 
-# データ挿入
-cursor.execute("INSERT INTO bio_table VALUES ('test', 'test', '', '', '')")
-connection.commit()
-print("Data inserted")
-
-# データ読み込み
-cursor.execute("SELECT * FROM bio_table")
-records = cursor.fetchall()
-print("Data from bio_table:", records)
-
-
-cursor.close()
-connection.close()
-print("Connection closed")
-'''
+# swiftuiからpythonにてdatetimeへ変換する
+# swift_time = datetime.strptime(swift_time_string, '%Y-%m-%dT%H:%M:%S')

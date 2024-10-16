@@ -1,52 +1,51 @@
 ## 目次
-### 1.カメラから瞳孔径を計測する
-### 2.Apple Watchを使って心拍数を計測する
-### 3.サーバ同期をする
+### データベースのテーブルを確認する方法
 
 ## 本文
-### 1.カメラから瞳孔径を計測する
+### データベースのテーブルを確認する方法
 
-<1> infraredCamera.pyを実行します。
+<1> Macbookのターミナルを開いてさくらサーバに入ります。
 
 ```sh
-python infraredCamera.py
+ssh selab@(IPアドレス)
 ```
 
-Intel RealSense D435をUSB接続して実行してください。<br>
-赤外線カメラ起動しない場合はescキーもしくはcontrol + Cを実行して終了させた後にUSBを差し直してください。
+MariaDBコンテナに入ります。
 
-### 2.Apple Watchを使って心拍数を計測する
+```sh
+docker exec -it bio-container bash
+```
 
-<1> Xcodeを起動して Create New Project > watchOSタブのAPPを選択してNext > Product NameはHeartRateを記入しBundle IdentiferはWatch APP with New Companion iOS Appを選択してNext
+rootユーザでコンテナ内のmariadbにアクセスします。
 
-<2> GitのContentView.swiftをコピーしてXCodeのHeartRate/HeartRate/ContentViewに貼り付ける。<br>
-続いてGitのWatchContentView.swiftをコピーしてXCodeのHeartRate/HeartRate Watch APP/ContentViewに貼り付ける。
+```sh
+mariadb -u root -p
+```
 
-<3> HealthKitを利用可能にするためHeartRate(プロジェクトフォルダ)を選択してTARGETSにHeartRateを設定する。<br>
-infoタブを開きkeyの任意の場所で右クリックをしてAdd Rowを選択する。<br>
-Add Rowするとプルダウンが表示されるので、
-* Privacy - Health Share Usage Description
-* Privacy - Health Update Usage Description
-* Privacy - Health Records Usage Description
+データベースを選択します。
 
-の3つを追加する。<br>
-追加したkeyのValueのところにfor use healthkitと入力(文字はなんでも良いですが、文字数と文字形式に制限があります)
+```sh
+USE bio-db;
+```
 
-<img width="1283" alt="スクリーンショット 2024-10-05 23 46 33" src="https://github.com/user-attachments/assets/7bfc9948-c614-4071-b1ff-3430082f5fbf">
+SQLでテーブル内を参照したり、削除したり、挿入したり好きなようにできます。<br>
+以下は全テーブルを参照する例です。
 
-Package Dependenciesに関しては余計なこと(結果的に不必要だったもの)をしただけなので気にしないでください。
+```sh
+SELECT * FROM bio_table;
+```
 
-<4> macとiPhoneをUSB接続して上部のデバイスを自身のiPhoneに変更します。
+他にもいくつか使いそうなものの例を上げておきます。<br>
+・テーブルのカラムを確認する
 
-<img width="564" alt="スクリーンショット 2024-10-05 23 51 12" src="https://github.com/user-attachments/assets/82e79ba1-ec32-4409-bc90-6ac434bf0950">
+```sh
+DESCRIBE bio_table;
+```
 
-<5> XCodeの左上に再生ボタンがあるので押します
+・テーブルの特定のデータを消去する(双方の許可がある、もしくは不要なことが自明な場合に使いましょう)<br>
+なお、WHEREはSELECT * FROMの時など色々な場面で使えます。
 
-<6> iPhone側でHeartRateからのHealthKit利用を許可します。
+```sh
+DElETE FROM bio_table WHERE heartRate >= 30;
+```
 
-<7> Apple Watchのstart workoutボタンを押せば計測が開始されます。
-
-### 3.サーバ同期をする
-
-現在コーディング中です。<br>
-出来上がり次第、更新します。

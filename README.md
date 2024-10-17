@@ -1,5 +1,6 @@
 ## 目次
 ### 1.データベースのテーブルを確認する方法
+### 2.integration_testブランチに更新する
 
 ## 本文
 ### 1.データベースのテーブルを確認する方法
@@ -49,3 +50,13 @@ DESCRIBE bio_table;
 DElETE FROM bio_table WHERE heartRate >= 30;
 ```
 
+### 2.integration_testブランチに更新する
+以下のコマンドを打つと更新が反映されます。
+
+```sh
+git add .
+git commit -m "コメント"
+git push origin integration_test
+```
+
+(addの.はファイル名を指定することもできます)

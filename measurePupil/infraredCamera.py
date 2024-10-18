@@ -88,7 +88,7 @@ while True:
     
     ### 左目の検出及び矩形の描画
     # カスケード型の識別器
-    eye_cascade = cv2.CascadeClassifier('haarcascade_left_eye.xml')
+    eye_cascade = cv2.CascadeClassifier('measurePupil/haarcascade_left_eye.xml')
     # 目を検出
     eyes = eye_cascade.detectMultiScale(median, scaleFactor=1.1, minNeighbors=5, minSize=(30,30))
     # 検出しなかった場合

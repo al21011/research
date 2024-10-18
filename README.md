@@ -1,5 +1,6 @@
 ## 目次
 ### 1.データベースのテーブルを確認する方法
+### 2.integration_testブランチに更新する
 
 ## 本文
 ### 1.データベースのテーブルを確認する方法
@@ -49,3 +50,23 @@ DESCRIBE bio_table;
 DElETE FROM bio_table WHERE heartRate >= 30;
 ```
 
+### 2.integration_testブランチに更新する
+以下のコマンドを打つと更新が反映されます。<>
+(addの.はファイル名を指定することもできます)
+
+```sh
+git add .
+git commit -m "コメント"
+git push origin integration_test
+```
+
+pushで弾かれる場合(リモートとローカルのブランチ履歴が違うと発生します)<br>
+以下のコードを実行して下さい。多くの場合はこちらでpushを行えるようになります。
+
+```sh
+git pull origin integration_test
+```
+
+実行に少し時間がかかることがあります。また、ターミナルが遷移してしまった場合は:q!を入力してEnterキーを押すと解決します。
+
+実行が済んだらpushを改めて行います。

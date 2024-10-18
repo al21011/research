@@ -45,5 +45,3 @@ def add_user():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
 
-# swiftuiからpythonにてdatetimeへ変換する
-# swift_time = datetime.strptime(swift_time_string, '%Y-%m-%dT%H:%M:%S')

@@ -28,7 +28,7 @@ def p_tile_threshold(img_gray, per):
     return img_thr
 
 ### サーバ内のデータベースに書き込む処理
-def mariadb_transactions(time, pupil, eyeX, eyeY, blink) -> None:
+def mariadb_transactions(time, pupil, position, blink) -> None:
     try:
         con = mariadb.connect(
             host='160.16.210.86',
@@ -41,11 +41,11 @@ def mariadb_transactions(time, pupil, eyeX, eyeY, blink) -> None:
         
         # テーブルにデータ挿入
         insert_query = '''
-        INSERT INTO bio_table (time, pupil, eyeX, eyeY, blink)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO bio_table (time, pupil, position, blink)
+        VALUES (%s, %s, %s, %s)
         '''
         # クエリ実行
-        cur.execute(insert_query, (time, pupil, eyeX, eyeY, blink))
+        cur.execute(insert_query, (time, pupil, position, blink))
         
         # コネクションの終了
         con.commit()
@@ -72,7 +72,7 @@ blink_flag = 0
 while True:
     # データベースに書き込む情報
     now_time = datetime.now()
-    pupil, eyeX, eyeY = [], [], []
+    pupil, position = [], []
     
     ret, frame = cap.read()
     
@@ -131,8 +131,12 @@ while True:
                 
             # 取得データをリストに追加する
             pupil.append(circles[0][2]*2)
-            eyeX.append(x+circles[0][0])
-            eyeY.append(y+circles[0][1])
+            if circles[0][0] < (7*w/18):
+                position.append(0)
+            elif circles[0][0] < (4*w/9):
+                position.append(1)
+            else:
+                position.append(2)
 
             
             # データベースへ書き込み
@@ -140,14 +144,12 @@ while True:
                 mariadb_transactions(
                     now_time,
                     int(cal_median(pupil)),
-                    int(cal_median(eyeX)),
-                    int(cal_median(eyeY)),
+                    int(cal_median(position)),
                     blink_flag
                 )
                 # 色々リセット
                 pupil.clear()
-                eyeX.clear()
-                eyeY.clear()
+                position.clear()
                 blink_flag = 0
                 tmp_time = int(now_time.second)
                 time.sleep(0.05)

@@ -9,6 +9,7 @@
 import mariadb
 import numpy as np
 import statistics
+import time
 import random
 
 # 準備用の関数により得られた値を記入
@@ -143,3 +144,4 @@ def random_value(min_value, max_value):
 # 運転開始後に実行する
 while True:
     print(cul_estimation())
+    time.sleep(1)

@@ -64,6 +64,13 @@ def mariadb_fetch() -> int:
         print(f'Error commiting transaction: {e}')
         con.rollback()
 
+### 2つの値の差の絶対値を返す
+def cul_dif(cnt, m) -> int:
+    ans = cnt - int(m/3)
+    if ans < 0:
+        ans *= -1
+    return ans
+
 ### 運転開始後
 def cul_estimation() -> int:
     # 各項目の重みを設定(計1になるように)
@@ -110,8 +117,10 @@ def cul_estimation() -> int:
             hyperfocus = sum(1 for x in pupil_list if x > (pupil_m+2))
             if decentralized > hyperfocus:
                 pupil_cnt = decentralized * (-1)
-            else:
+            elif decentralized < hyperfocus:
                 pupil_cnt = hyperfocus
+            else:
+                pupil_cnt = int(pupil_m / 3)
             # 脇見回数を記録
             position_cnt = position_list.count(1)
             if int(position_m/3) < position_cnt:
@@ -121,8 +130,13 @@ def cul_estimation() -> int:
             if int(blink_m/3) < blink_cnt:
                 blink_cnt *= -1
             
+            # 基準値との差を算出する
+            pupil_dif = cul_dif(pupil_cnt, pupil_m)
+            position_dif = cul_dif(position_cnt, position_m)
+            blink_dif = cul_dif(blink_cnt, blink_m)
+            
             # 重みを考慮して集中具合を算出(0:非集中　1:適切　2:過集中)
-            concentrate_value = 1.00 + ((pupil_cnt * pupil_w) + (position_cnt * position_w) + (blink_cnt * blink_w)) / 10
+            concentrate_value = 1.00 + ((pupil_dif * pupil_w) + (position_dif * position_w) + (blink_dif * blink_w)) / 10
             if concentrate_value < 0.00:
                 concentrate_value = 0.00
             elif concentrate_value > 2.00:

@@ -10,6 +10,7 @@ import mariadb
 import numpy as np
 import statistics
 import time
+import keyboard
 import random
 
 # 準備用の関数により得られた値を記入
@@ -159,3 +160,8 @@ def random_value(min_value, max_value):
 while True:
     print(cul_estimation())
     time.sleep(1)
+
+    # escキーで終了
+    if keyboard.is_pressed('esc'):
+        print('Loop terminated by user')
+        break

@@ -25,7 +25,7 @@ def Calc_RRI(val_decoded):
             prev_RRI_time = current_time
             last_cross_time = current_time
 
-ser = serial.Serial('/dev/tty.usbmodem141101', 9600) # ここのポート番号を変更
+ser = serial.Serial('/dev/cu.usbmodem11101', 9600) # ここのポート番号を変更
 ser.readline()
 while True:
   val_arduino = ser.readline()

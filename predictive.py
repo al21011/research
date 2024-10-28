@@ -8,7 +8,7 @@
 '''
 
 # estimation.pyでの関数が呼び出せるようになります
-import estimation
+import eyeEstimation
 import time
 
 def main():
@@ -19,8 +19,8 @@ def main():
     ### 擬似的に緊張感と集中力を算出します
     while True:
         # これらの値を使って開発を進めて下さい
-        tension = round(estimation.random_value(*tension_area), 2)
-        concentration = round(estimation.random_value(*concentration_area), 2)
+        tension = round(eyeEstimation.random_value(*tension_area), 2)
+        concentration = round(eyeEstimation.random_value(*concentration_area), 2)
         # 一応出力しておきます
         print('緊張感：' + str(tension))
         print('集中力；' + str(concentration))

@@ -34,6 +34,8 @@ def plot_poincare(rri):
     plt.grid(True)
     plt.show()
     
+    return np.array(rri_n), np.array(rri_n1)
+    
 ### 最大距離の算出
 def max_distances(rri_n, rri_n1):
     # 各点の並行成分と垂直成分を計算
@@ -50,5 +52,6 @@ def max_distances(rri_n, rri_n1):
 
 # RRIの例データ（単位はms）
 rri_data = [800, 810, 790, 830, 820, 850, 800, 790, 770, 760, 780]
-plot_poincare(rri_data)
+rri_n, rri_n1 = plot_poincare(rri_data)
+L, T = max_distances(rri_n, rri_n1)
     

@@ -3,7 +3,6 @@ import numpy as np
 import mariadb
 import time
 from datetime import datetime
-import asyncio
 
 # カメラ設定
 cap = cv2.VideoCapture(0)
@@ -91,6 +90,9 @@ while True:
     eye_cascade = cv2.CascadeClassifier('pupil/haarcascade_left_eye.xml')
     # 目を検出
     eyes = eye_cascade.detectMultiScale(median, scaleFactor=1.1, minNeighbors=5, minSize=(30,30))
+    # 目の検出数は1つに絞る
+    if len(eyes) >= 2:
+        continue
     # 検出しなかった場合
     if len(eyes) == 0:
         cv2.putText(median, 'Blink...', (20,20), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255,255,255))

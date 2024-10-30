@@ -1,9 +1,12 @@
 import serial
 import time
+
 Threshold = 600   #心電の閾値(Arduinoのシリアルプロッタから確認すると吉)
 Timeout = 0.3   #1度目のピークから次のピークまでのタイムアウト
+
 last_cross_time = None  # 前回閾値を超えた時刻
 prev_RRI_time = None  # 前回のRRI計測時刻
+
 def Calc_RRI(val_decoded):
     global last_cross_time, prev_RRI_time
     current_time = time.time()  # 現在の時間を取得
@@ -21,6 +24,7 @@ def Calc_RRI(val_decoded):
             # 時刻を更新
             prev_RRI_time = current_time
             last_cross_time = current_time
+
 ser = serial.Serial('/dev/cu.usbmodem1101', 9600) # ここのポート番号を変更
 ser.readline()
 while True:

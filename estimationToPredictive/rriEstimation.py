@@ -7,86 +7,143 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import mariadb
+from sklearn.decomposition import PCA
 
 poincare_value = 2.3438        # 準備段階で算出した値
 
-### RRIを最新100行取得する
-def rri_fetch():
-    rri_values = []
+Threshold = 600   #心電の閾値(Arduinoのシリアルプロッタから確認すると吉)
+Timeout = 0.3   #1度目のピークから次のピークまでのタイムアウト
+
+last_cross_time = None  # 前回閾値を超えた時刻
+prev_RRI_time = None  # 前回のRRI計測時刻
+
+rri_record = 0.0
+
+### RRIを計算する(未取得：0)
+def Calc_RRI(val_decoded):
+    global last_cross_time, prev_RRI_time
+    global rri_record
+    current_time = time.time()  # 現在の時間を取得
     
+    if val_decoded > Threshold:# 閾値を超えたか
+        if last_cross_time is None or (current_time - last_cross_time > Timeout):# 次のピークまでの時間
+            if prev_RRI_time is not None:
+                
+                RRI = current_time - prev_RRI_time  # RRIを算出
+                print('{:.5f}'.format(RRI), end=' , ')
+                rri_record = round(RRI, 4)
+                
+                HR = 60/RRI  #瞬間心拍数を算出
+                print('{:.5f}'.format(HR))
+            
+            # 時刻を更新
+            prev_RRI_time = current_time
+            last_cross_time = current_time
+
+### RRIを時間と共にDBのカラムへ書き込む
+def writeRRI(Time, RRI):
     try:
         con = mariadb.connect(
             host='160.16.210.86',
             port=3307,
             user='root',
             password='selab',
-            database='bio-db'
+            database='std_db'
+        )
+        cur = con.cursor()
+
+        # テーブルにデータ挿入
+        insert_query = '''
+        INSERT INTO std_table (Time, RRI)
+        VALUES (%s, %s)
+        '''
+        # クエリ実行
+        cur.execute(insert_query, (Time, RRI))
+            
+        # コミットして行が更新されたか確認
+        con.commit()
+            
+        # コネクションの終了
+        con.close()
+    except Exception as e:
+        print(f'Error commiting transaction: {e}')
+        con.rollback()
+
+### RRIを最新100行取得する
+def rri_fetch():
+    try:
+        con = mariadb.connect(
+            host='160.16.210.86',
+            port=3307,
+            user='root',
+            password='selab',
+            database='std_db'
         )
         cur = con.cursor()
         
-        # テーブルからデータ取得(実験前に行う計測の開始時刻を記入)
+        # テーブルからデータ取得(最新100行を取得)
         insert_query = '''
-        SELECT RRI FROM bio_table WHERE RRI IS NOT NULL ORDER BY time DESC LIMIT 100
+        SELECT RRI FROM std_table
+        WHERE Time >= '2024-10-31 03:16:30'
+        ORDER BY Time DESC LIMIT 100
         '''
         # クエリ実行
         cur.execute(insert_query)
         
         # データの取得
-        rri_values = [row(0) for row in cur.fetchall()] 
+        data = cur.fetchall()
+        data.reverse()
                
         # コネクションの終了
         cur.close()
         con.close()
         
-        return rri_values
+        return data
         
     except Exception as e:
         print(f'Error commiting transaction: {e}')
         con.rollback()
 
-### RRIデータからポアンカレプロットを描画する関数
-def plot_poincare(rri):
-    # RRIデータから次のRRI間隔とその前のRR間隔を取得
-    rri_n = rri[:-1]
-    rri_n1 = rri[1:]
+### L/Tの計算
+def calculate_axes(returns):
+    # PCAを使用して主成分を計算
+    pca = PCA(n_components=2)
+    # データを整形
+    data = np.column_stack((returns[:-1], returns[1:]))
+    pca.fit(data)
+
+    # 主成分ベクトル
+    components = pca.components_
+    # 分散
+    explained_variance = pca.explained_variance_
+
+    # 長軸と短軸の長さを取得
+    L = 2 * np.sqrt(explained_variance[0])  # 長軸
+    T = 2 * np.sqrt(explained_variance[1])  # 短軸
     
-    # プロットの作成
-    plt.figure(figsize=(6, 6))
-    plt.scatter(rri_n, rri_n1, color='blue', alpha=0.5, edgecolor='k', s=20)
+    return L/T
+
+ser = serial.Serial('/dev/cu.usbmodem1101', 9600) # ここのポート番号を変更
+ser.readline()
+
+# 毎秒処理を行う
+last_time = time.time()
+while True:
+    # RRIを書き込む
+    val_arduino = ser.readline()
+    val_decoded = int(repr(val_arduino.decode())[1:-5])
+    Calc_RRI(val_decoded)
     
-    # 軸の設定
-    plt.xlabel("RRI(n) [ms]")
-    plt.ylabel("RRI(n+1) [ms]")
-    plt.title("Poincare Plot")
-    plt.axline((0, 0), slope=1, color="red", linestyle="--")
+    current_time = time.time()
+    if current_time - last_time >= 1:
+        writeRRI(time.strftime('%Y-%m-%d %H:%M:%S'), rri_record)
+        last_time = current_time
+    # L/Tを再計算
+    L_T = (calculate_axes(rri_fetch()))
+    # 基準値と比べて推定値算出
+    if poincare_value > L_T:
+        print('small')
+    else:
+        print('big')
     
-    # 軸の範囲をRRIの範囲に合わせる
-    min_rri = min(min(rri_n), min(rri_n1))
-    max_rri = max(max(rri_n), max(rri_n1))
-    plt.xlim(min_rri - 50, max_rri + 50)
-    plt.ylim(min_rri - 50, max_rri + 50)
-    
-    plt.grid(True)
-    plt.show()
-    
-    return np.array(rri_n), np.array(rri_n1)
-    
-### 最大距離の算出
-def max_distances(rri_n, rri_n1):
-    # 各点の並行成分と垂直成分を計算
-    parallel_components = (rri_n + rri_n1) / np.sqrt(2)
-    perpendicular_components = (rri_n1 - rri_n) / np.sqrt(2)
-    
-    # 並行成分の最大距離
-    L = np.max(parallel_components) - np.min(parallel_components)
-    
-    # 垂直成分の最大距離
-    T = np.max(perpendicular_components) - np.min(perpendicular_components)
-    
-    return L, T
-  
-# RRIの例データ（単位はms）
-rri_data = [800, 810, 790, 830, 820, 850, 800, 790, 770, 760, 780]
-rri_n, rri_n1 = plot_poincare(rri_fetch())
-L, T = max_distances(rri_n, rri_n1)  
-print(L/T)
+ser.close()

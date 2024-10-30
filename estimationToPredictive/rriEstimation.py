@@ -1,9 +1,6 @@
 '''
-### 心電センサを用いた集中力の推定機能の実装
-    1.
-    2.準備用の関数を実行して基準値を
-    DBにはtime, heartRate, RRI, position, blinkの順でカラムが用意されている
-    0.00-2.00の間で算出し、エラーは3.00とする
+ポアンカレプロットによる緊張感推定
+準備: std_dbから最新100行を取得してポアンカレプロットによる数値を算出して変数に格納する
 '''
 import serial
 import time
@@ -11,33 +8,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import mariadb
 
-Threshold = 600   #心電の閾値(Arduinoのシリアルプロッタから確認すると吉)
-Timeout = 0.3   #1度目のピークから次のピークまでのタイムアウト
+poincare_value = 2.3438        # 準備段階で算出した値
 
-last_cross_time = None  # 前回閾値を超えた時刻
-prev_RRI_time = None  # 前回のRRI計測時刻
-
-def Calc_RRI(val_decoded):
-    global last_cross_time, prev_RRI_time
-    current_time = time.time()  # 現在の時間を取得
+### RRIを最新100行取得する
+def rri_fetch():
+    rri_values = []
     
-    if val_decoded > Threshold:# 閾値を超えたか
-        if last_cross_time is None or (current_time - last_cross_time > Timeout):# 次のピークまでの時間
-            if prev_RRI_time is not None:
-                
-                RRI = current_time - prev_RRI_time  # RRIを算出
-                
-                HR = 60/RRI  #瞬間心拍数を算出
-                
-                return RRI, HR
-            
-            # 時刻を更新
-            prev_RRI_time = current_time
-            last_cross_time = current_time
-    return 0, 0
-
-### データベースへの時間による同期及び書き込み
-def mariadb_fetch() -> int:
     try:
         con = mariadb.connect(
             host='160.16.210.86',
@@ -50,26 +26,19 @@ def mariadb_fetch() -> int:
         
         # テーブルからデータ取得(実験前に行う計測の開始時刻を記入)
         insert_query = '''
-        SELECT pupil, position, blink FROM bio_table
-        WHERE time >= '2024-10-24 03:34:05'
-        ORDER BY time ASC LIMIT 30
+        SELECT RRI FROM bio_table WHERE RRI IS NOT NULL ORDER BY time DESC LIMIT 100
         '''
         # クエリ実行
         cur.execute(insert_query)
         
         # データの取得
-        data = cur.fetchall()
-        
+        rri_values = [row(0) for row in cur.fetchall()] 
+               
         # コネクションの終了
         cur.close()
         con.close()
         
-        # 各カラムについてリストに格納
-        pupil_list = [row[0] for row in data]
-        position_list = [row[1] for row in data]
-        blink_list = [row[2] for row in data]
-        
-        return mode_or_median(pupil_list), position_list.count(1), blink_list.count(1)
+        return rri_values
         
     except Exception as e:
         print(f'Error commiting transaction: {e}')
@@ -115,17 +84,9 @@ def max_distances(rri_n, rri_n1):
     T = np.max(perpendicular_components) - np.min(perpendicular_components)
     
     return L, T
-
-ser = serial.Serial('/dev/cu.usbmodem1101', 9600) # ここのポート番号を変更
-ser.readline()
-while True:
-  val_arduino = ser.readline()
-  val_decoded = int(repr(val_arduino.decode())[1:-5])
-  RRI, HR = Calc_RRI(val_decoded)
   
 # RRIの例データ（単位はms）
 rri_data = [800, 810, 790, 830, 820, 850, 800, 790, 770, 760, 780]
-rri_n, rri_n1 = plot_poincare(rri_data)
-L, T = max_distances(rri_n, rri_n1)
-
-ser.close()   
+rri_n, rri_n1 = plot_poincare(rri_fetch())
+L, T = max_distances(rri_n, rri_n1)  
+print(L/T)

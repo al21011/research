@@ -144,6 +144,11 @@ while True:
             L_T = (calculate_axes(rri_fetch()))
             print(L_T)
             # 推定値算出
-            print((L_T - 1) * 2 / 3)
-    
+            est_value = (L_T - 1) * 2.0 / 3.0
+            if est_value < 0.0:
+                est_value = 0.0
+            elif 2.0 < est_value:
+                est_value = 2.0
+            print(est_value)
+
 ser.close()

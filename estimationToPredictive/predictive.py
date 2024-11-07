@@ -8,7 +8,7 @@
 '''
 
 # estimation.pyでの関数が呼び出せるようになります
-import eyeEstimation
+import estimationToPredictive.eyeEstimation as eyeEstimation
 import time
 
 def main():

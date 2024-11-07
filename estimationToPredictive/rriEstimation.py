@@ -143,7 +143,7 @@ while True:
             # L/Tを再計算
             L_T = (calculate_axes(rri_fetch()))
             print(L_T)
-            # 基準値と比べて推定値算出
-            # print(L_T / poincare_value)
+            # 推定値算出
+            print((L_T - 1) * 2 / 3)
     
 ser.close()

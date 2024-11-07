@@ -30,11 +30,11 @@ def Calc_RRI(val_decoded):
             if prev_RRI_time is not None:
                 
                 RRI = current_time - prev_RRI_time  # RRIを算出
-                print('{:.5f}'.format(RRI), end=' , ')
+                # print('{:.5f}'.format(RRI), end=' , ')
                 rri_record = round(RRI, 4)
                 
                 HR = 60/RRI  #瞬間心拍数を算出
-                print('{:.5f}'.format(HR))
+                # print('{:.5f}'.format(HR))
             
             # 時刻を更新
             prev_RRI_time = current_time
@@ -129,21 +129,21 @@ ser.readline()
 # 毎秒処理を行う
 last_time = time.time()
 while True:
-    # RRIを書き込む
+    # RRIを計算する
     val_arduino = ser.readline()
     val_decoded = int(repr(val_arduino.decode())[1:-5])
     Calc_RRI(val_decoded)
     
-    current_time = time.time()
-    if current_time - last_time >= 1:
-        writeRRI(time.strftime('%Y-%m-%d %H:%M:%S'), rri_record)
-        last_time = current_time
-    # L/Tを再計算
-    L_T = (calculate_axes(rri_fetch()))
-    # 基準値と比べて推定値算出
-    if poincare_value > L_T:
-        print('small')
-    else:
-        print('big')
+    if rri_record > 0.0:
+        # RRIを毎秒書き込む
+        current_time = time.time()
+        if current_time - last_time >= 1:
+            writeRRI(time.strftime('%Y-%m-%d %H:%M:%S'), rri_record)
+            last_time = current_time
+            # L/Tを再計算
+            L_T = (calculate_axes(rri_fetch()))
+            print(L_T)
+            # 基準値と比べて推定値算出
+            # print(L_T / poincare_value)
     
 ser.close()

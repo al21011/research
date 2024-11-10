@@ -2,14 +2,13 @@
 ポアンカレプロットによる緊張感推定
 準備: std_dbから最新100行を取得してポアンカレプロットによる数値を算出して変数に格納する
 '''
+import estimationToPredictive.databaseFunc as db
 import serial
 import time
 import matplotlib.pyplot as plt
 import numpy as np
 import mariadb
 from sklearn.decomposition import PCA
-
-poincare_value = 2.3438        # 準備段階で算出した値
 
 Threshold = 600   #心電の閾値(Arduinoのシリアルプロッタから確認すると吉)
 Timeout = 0.3   #1度目のピークから次のピークまでのタイムアウト
@@ -39,70 +38,6 @@ def Calc_RRI(val_decoded):
             # 時刻を更新
             prev_RRI_time = current_time
             last_cross_time = current_time
-
-### RRIを時間と共にDBのカラムへ書き込む
-def writeRRI(Time, RRI):
-    try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='std_db'
-        )
-        cur = con.cursor()
-
-        # テーブルにデータ挿入
-        insert_query = '''
-        INSERT INTO std_table (Time, RRI)
-        VALUES (%s, %s)
-        '''
-        # クエリ実行
-        cur.execute(insert_query, (Time, RRI))
-            
-        # コミットして行が更新されたか確認
-        con.commit()
-            
-        # コネクションの終了
-        con.close()
-    except Exception as e:
-        print(f'Error commiting transaction: {e}')
-        con.rollback()
-
-### RRIを最新100行取得する
-def rri_fetch():
-    try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='std_db'
-        )
-        cur = con.cursor()
-        
-        # テーブルからデータ取得(最新100行を取得)
-        insert_query = '''
-        SELECT RRI FROM std_table
-        WHERE Time >= '2024-10-31 03:16:30'
-        ORDER BY Time DESC LIMIT 100
-        '''
-        # クエリ実行
-        cur.execute(insert_query)
-        
-        # データの取得
-        data = cur.fetchall()
-        data.reverse()
-               
-        # コネクションの終了
-        cur.close()
-        con.close()
-        
-        return data
-        
-    except Exception as e:
-        print(f'Error commiting transaction: {e}')
-        con.rollback()
 
 ### L/Tの計算
 def calculate_axes(returns):
@@ -138,10 +73,10 @@ while True:
         # RRIを毎秒書き込む
         current_time = time.time()
         if current_time - last_time >= 1:
-            writeRRI(time.strftime('%Y-%m-%d %H:%M:%S'), rri_record)
+            db.write_rri_table(time.strftime('%Y-%m-%d %H:%M:%S'), rri_record)
             last_time = current_time
             # L/Tを再計算
-            L_T = (calculate_axes(rri_fetch()))
+            L_T = (calculate_axes(db.fetch_rri_table()))
             print(L_T)
             # 推定値算出
             est_value = (L_T - 1) * 2.0 / 3.0

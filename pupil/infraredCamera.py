@@ -1,3 +1,5 @@
+import imageFunc
+import bio_db as db
 import cv2
 import numpy as np
 import mariadb
@@ -6,63 +8,6 @@ from datetime import datetime
 
 # カメラ設定
 cap = cv2.VideoCapture(0)
-
-### Pタイル法による2値化処理
-def p_tile_threshold(img_gray, per):
-    img_hist = cv2.calcHist([img_gray], [0], None, [256], [0, 256])
-    # 画像で占める割合から画素数を計算
-    all_pic = img_gray.shape[0] * img_gray.shape[1]
-    pic_per = all_pic * per
-    # Pタイル法による閾値計算
-    p_tile_thr = 0
-    pic_sum = 0
-    for hist in img_hist:
-        pic_sum += hist
-        # 輝度の割合が定めた割合を超えた場合に終了
-        if pic_sum > pic_per:
-            break
-        p_tile_thr += 1
-    # Pタイル法を踏まえて2値化処理
-    ret, img_thr = cv2.threshold(img_gray, p_tile_thr, 255, cv2.THRESH_BINARY)
-    return img_thr
-
-### サーバ内のデータベースに書き込む処理
-def mariadb_transactions(time, pupil, position, blink) -> None:
-    try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='bio-db'
-        )
-        cur = con.cursor()
-        
-        # テーブルにデータ挿入
-        insert_query = '''
-        INSERT INTO bio_table (time, pupil, position, blink)
-        VALUES (%s, %s, %s, %s)
-        '''
-        # クエリ実行
-        cur.execute(insert_query, (time, pupil, position, blink))
-        
-        # コネクションの終了
-        con.commit()
-        con.close()
-        print(f'{time}')
-    except Exception as e:
-        print(f'Error commiting transaction: {e}')
-        con.rollback()
-    
-### リストの中央値を返す
-def cal_median(list):
-    sorted_list = sorted(list)
-    n = len(sorted_list)
-    return sorted_list[n // 2]
-
-### スレッド処理用1秒待機
-def call_periodically():
-    time.sleep(1)
 
 # 変数
 tmp_time = -1
@@ -106,20 +51,7 @@ while True:
         blurred_eye_region = cv2.GaussianBlur(eye_region, (9, 9), 2)
         
         # Pタイル法
-        binary_frame = p_tile_threshold(blurred_eye_region, 0.01)
-        
-        '''
-        # Cannyエッジ検出
-        edges = cv2.Canny(blurred_eye_region, 50, 150)
-        # CLAHE(適応的ヒストグラム平坦化)によるコントラスト強調 + 大津の2値化
-        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-        enhanced_image = clahe.apply(blurred_eye_region)
-        ret, binary_frame = cv2.threshold(enhanced_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        # 大津の二値化
-        ret, binary_frame = cv2.threshold(blurred_eye_region, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        # アダプティブ2値化
-        binary_frame = cv2.adaptiveThreshold(blurred_eye_region, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-        '''
+        binary_frame = imageFunc.p_tile(blurred_eye_region, 0.01)
         
         # ハフ円検出
         circles = cv2.HoughCircles(binary_frame, cv2.HOUGH_GRADIENT, dp=1, minDist=500, param1=100, param2=10, minRadius=0, maxRadius=40)
@@ -143,10 +75,10 @@ while True:
             
             # データベースへ書き込み
             if (int(now_time.second) - tmp_time >= 1) or (int(now_time.second) - tmp_time < 0):
-                mariadb_transactions(
+                db.write_bio_db(
                     now_time,
-                    int(cal_median(pupil)),
-                    int(cal_median(position)),
+                    int(imageFunc.cal_median(pupil)),
+                    int(imageFunc.cal_median(position)),
                     blink_flag
                 )
                 # 色々リセット

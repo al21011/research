@@ -7,30 +7,33 @@
 
 import culFunc
 import databaseFunc as db
+import time
+import statistics
 
 # 推定値算出時の基準値から外れた値の影響度
 est_w = 0.3
 
 # 準備用の関数により得られた値を記入
 pupil_m = 20
-position_m = 24
-blink_m = 2
+position_m = 14
+blink_m = 20
 
-### 集中力推定値算出
-def cul_estimation() -> float:
-    # 各項目の重みを設定(計1になるように)
-    pupil_w = 0.5
-    position_w = 0.2
-    blink_w = 0.3
+### 集中力推定値を書き込む
+def write_estimation() -> float:
+    # 各項目の重みを設定
+    pupil_w = 0.30
+    position_w = 0.20
+    blink_w = 0.10
     
-    data = db.fetch_bio_db()
+    data = db.fetch_eye_table()
     if not data:
         return 3.00
     else:
         # 各カラムについてリストに格納
-        pupil_list = [row[0] for row in data]
-        position_list = [row[1] for row in data]
-        blink_list = [row[2] for row in data]
+        Time_list = [row[0] for row in data]
+        pupil_list = [row[1] for row in data]
+        position_list = [row[2] for row in data]
+        blink_list = [row[3] for row in data]
         
         # 非集中時、過集中時の秒数を記録
         decentralized = sum(1 for x in pupil_list if x < pupil_m)
@@ -50,13 +53,16 @@ def cul_estimation() -> float:
         blink_dif = blink_m - blink_cnt
         
         # 重みを考慮して集中具合を算出(0:非集中　1:適切　2:過集中)
-        concentrate_value = 1.00 + ((pupil_cnt * pupil_w) + (position_dif * position_w) + (blink_dif * blink_w)) * est_w
-        if concentrate_value < 0.00:
-            concentrate_value = 0.00
-        elif concentrate_value > 2.00:
-            concentrate_value = 2.00
+        concentration = 1.00 + ((pupil_cnt * pupil_w) + (position_dif * position_w) + (blink_dif * blink_w)) * est_w
+        if concentration < 0.00:
+            concentration = 0.00
+        elif concentration > 2.00:
+            concentration = 2.00
         
-        return round(concentrate_value, 2)
+        print(statistics.median(pupil_list), position_cnt, blink_cnt)
+        
+        # 算出値をデータベースに書き込む
+        db.update_eye_table(Time_list[0], concentration)
 
 # 準備段階で被験者の基準値を計測する
 def ref_value():
@@ -82,7 +88,7 @@ def ref_value():
 # デバッグ
 while True:
     # 推定値の確認
-    # print(cul_estimation())
+    # print(write_estimation())
     time.sleep(1)
 
     # escキーで終了
@@ -92,4 +98,13 @@ while True:
 '''
 
 # 準備段階で使用
-print(ref_value())
+# print(ref_value())
+
+# 推定値の書き込みを実行
+# 毎秒処理を行う
+last_time = time.time()
+while True:
+    current_time = time.time()
+    if current_time - last_time >= 1:
+        write_estimation()
+        last_time = current_time

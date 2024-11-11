@@ -52,9 +52,9 @@ while True:
         # RRIを毎秒書き込む
         current_time = time.time()
         if current_time - last_time >= 1:
-            db.write_rri_table(time.strftime('%Y-%m-%d %H:%M:%S'), rri_record, None)
+            db.write_rri_table(time.strftime('%Y-%m-%d %H:%M:%S'), rri_record)
             last_time = current_time
-            # L/Tを再計算
+            # L/Tを再計算 
             L_T = (culFunc.calculate_axes(db.fetch_rri_table()))
             print(L_T)
             # 推定値算出

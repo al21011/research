@@ -8,30 +8,32 @@
 import culFunc
 import databaseFunc as db
 import time
+import statistics
 
 # 推定値算出時の基準値から外れた値の影響度
 est_w = 0.3
 
 # 準備用の関数により得られた値を記入
 pupil_m = 20
-position_m = 24
-blink_m = 2
+position_m = 14
+blink_m = 20
 
 ### 集中力推定値を書き込む
 def write_estimation() -> float:
-    # 各項目の重みを設定(計1になるように)
-    pupil_w = 0.5
-    position_w = 0.2
-    blink_w = 0.3
+    # 各項目の重みを設定
+    pupil_w = 0.30
+    position_w = 0.20
+    blink_w = 0.10
     
     data = db.fetch_eye_table()
     if not data:
         return 3.00
     else:
         # 各カラムについてリストに格納
-        pupil_list = [row[0] for row in data]
-        position_list = [row[1] for row in data]
-        blink_list = [row[2] for row in data]
+        Time_list = [row[0] for row in data]
+        pupil_list = [row[1] for row in data]
+        position_list = [row[2] for row in data]
+        blink_list = [row[3] for row in data]
         
         # 非集中時、過集中時の秒数を記録
         decentralized = sum(1 for x in pupil_list if x < pupil_m)
@@ -57,8 +59,10 @@ def write_estimation() -> float:
         elif concentration > 2.00:
             concentration = 2.00
         
+        print(statistics.median(pupil_list), position_cnt, blink_cnt)
+        
         # 算出値をデータベースに書き込む
-        db.update_eye_table(time.strftime('%Y-%m-%d %H:%M:%S'), round(concentration, 2))
+        db.update_eye_table(Time_list[0], concentration)
 
 # 準備段階で被験者の基準値を計測する
 def ref_value():
@@ -94,4 +98,13 @@ while True:
 '''
 
 # 準備段階で使用
-print(ref_value())
+# print(ref_value())
+
+# 推定値の書き込みを実行
+# 毎秒処理を行う
+last_time = time.time()
+while True:
+    current_time = time.time()
+    if current_time - last_time >= 1:
+        write_estimation()
+        last_time = current_time

@@ -16,16 +16,18 @@ start_eye = '2024-10-31 03:16:30'   # 瞳関連データを取得する開始時
 limit_eye = 30                      # 瞳関連データを取得する行数(準備段階)
 # limit_bio = 5                       # 瞳関連データを取得する行数(実験時)
 
-### rri_tableに書き込みを行う
+# アクセスするサーバおよびデータベース設定
+con = mariadb.connect(
+    host='160.16.210.86',
+    port=3307,
+    user='root',
+    password='selab',
+    database='est_db'
+)
+
+### rri_tableに心電データの書き込みを行う
 def write_rri_table(Time, rri):
     try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='est_db'
-        )
         cur = con.cursor()
 
         # テーブルにデータ挿入
@@ -45,16 +47,32 @@ def write_rri_table(Time, rri):
         print(f'Error commiting transaction: {e}')
         con.rollback()
 
+### rri_tableに緊張感推定値の書き込みを行う
+def update_rri_table(Time, tension):
+    try:
+        cur = con.cursor()
+
+        # テーブルにデータ挿入
+        insert_query = '''
+        UPDATE rri_table
+        SET tension = %s
+        WHERE Time = %s
+        '''
+        # クエリ実行
+        cur.execute(insert_query, (tension, Time))
+            
+        # コミットして行が更新されたか確認
+        con.commit()
+            
+        # コネクションの終了
+        con.close()
+    except Exception as e:
+        print(f'Error commiting transaction: {e}')
+        con.rollback()
+
 ### rri_tableの最新100行を取得する
 def fetch_rri_table() -> float:
     try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='est_db'
-        )
         cur = con.cursor()
         
         # テーブルからデータ取得(最新100行を取得)
@@ -80,16 +98,32 @@ def fetch_rri_table() -> float:
         print(f'Error commiting transaction: {e}')
         con.rollback()
 
+### eye_tableに集中力推定値を書き込む
+def update_eye_table(Time, concentration):
+    try:
+        cur = con.cursor()
+
+        # テーブルにデータ挿入
+        insert_query = '''
+        UPDATE eye_table
+        SET concentration = %s
+        WHERE Time = %s
+        '''
+        # クエリ実行
+        cur.execute(insert_query, (concentration, Time))
+            
+        # コミットして行が更新されたか確認
+        con.commit()
+            
+        # コネクションの終了
+        con.close()
+    except Exception as e:
+        print(f'Error commiting transaction: {e}')
+        con.rollback()
+
 ### eye_tableから読み取る
 def fetch_eye_table() -> int:
     try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='est_db'
-        )
         cur = con.cursor()
         
         # テーブルからデータ取得(実験前に行う計測の開始時刻を記入)
@@ -117,13 +151,6 @@ def fetch_eye_table() -> int:
 ### eye_tableとrri_tableの結合を行う
 def join_est_table():
     try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='est_db'
-        )
         cur = con.cursor()
 
         # テーブルにデータ挿入
@@ -150,13 +177,6 @@ def join_est_table():
 ### est_tableから5行読み取りを行う
 def fetch_est_table() -> float:
     try:
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='est_db'
-        )
         cur = con.cursor()
         
         # テーブルからデータ取得(最新100行を取得)

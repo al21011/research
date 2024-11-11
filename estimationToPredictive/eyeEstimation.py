@@ -7,6 +7,7 @@
 
 import culFunc
 import databaseFunc as db
+import time
 
 # 推定値算出時の基準値から外れた値の影響度
 est_w = 0.3
@@ -16,14 +17,14 @@ pupil_m = 20
 position_m = 24
 blink_m = 2
 
-### 集中力推定値算出
-def cul_estimation() -> float:
+### 集中力推定値を書き込む
+def write_estimation() -> float:
     # 各項目の重みを設定(計1になるように)
     pupil_w = 0.5
     position_w = 0.2
     blink_w = 0.3
     
-    data = db.fetch_bio_db()
+    data = db.fetch_eye_table()
     if not data:
         return 3.00
     else:
@@ -50,13 +51,14 @@ def cul_estimation() -> float:
         blink_dif = blink_m - blink_cnt
         
         # 重みを考慮して集中具合を算出(0:非集中　1:適切　2:過集中)
-        concentrate_value = 1.00 + ((pupil_cnt * pupil_w) + (position_dif * position_w) + (blink_dif * blink_w)) * est_w
-        if concentrate_value < 0.00:
-            concentrate_value = 0.00
-        elif concentrate_value > 2.00:
-            concentrate_value = 2.00
+        concentration = 1.00 + ((pupil_cnt * pupil_w) + (position_dif * position_w) + (blink_dif * blink_w)) * est_w
+        if concentration < 0.00:
+            concentration = 0.00
+        elif concentration > 2.00:
+            concentration = 2.00
         
-        return round(concentrate_value, 2)
+        # 算出値をデータベースに書き込む
+        db.update_eye_table(time.strftime('%Y-%m-%d %H:%M:%S'), round(concentration, 2))
 
 # 準備段階で被験者の基準値を計測する
 def ref_value():
@@ -82,7 +84,7 @@ def ref_value():
 # デバッグ
 while True:
     # 推定値の確認
-    # print(cul_estimation())
+    # print(write_estimation())
     time.sleep(1)
 
     # escキーで終了

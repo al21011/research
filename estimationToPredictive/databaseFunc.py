@@ -150,7 +150,10 @@ def update_eye_table(Time, concentration):
         SELECT e.Time, e.concentration, r.tension
         FROM eye_table e
         JOIN rri_table r ON e.Time = r.Time
-        WHERE e.concentration IS NOT NULL AND r.tension IS NOT NULL;
+        WHERE e.concentration IS NOT NULL AND r.tension IS NOT NULL
+        ON DUPLICATE KEY UPDATE
+            concentration = VALUES(concentration),
+            tension = VALUES(tension);
         '''
         cur.execute(join_query)
 

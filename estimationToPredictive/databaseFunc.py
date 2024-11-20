@@ -6,11 +6,10 @@
 '''
 
 import mariadb
-import statistics
 import numpy as np
 
 # データベースに書き込む時刻などの変数(実験時に確認してから動作させること)
-start_rri = '2024-10-31 03:16:30'   # 心電データを取得する開始時刻
+start_rri = '2024-11-20 11:18:26'   # 心電データを取得する開始時刻
 
 start_eye = '2024-10-31 03:16:30'   # 瞳関連データを取得する開始時刻
 limit_eye = 30                      # 瞳関連データを取得する行数(準備段階)
@@ -90,18 +89,11 @@ def fetch_rri_table() -> float:
             password='selab',
             database='est_db'
         )
-        con = mariadb.connect(
-            host='160.16.210.86',
-            port=3307,
-            user='root',
-            password='selab',
-            database='est_db'
-        )
         cur = con.cursor()
-        
+
         # テーブルからデータ取得(最新100行を取得)
         insert_query = f'''
-        SELECT RRI FROM rri_table
+        SELECT rri FROM rri_table
         WHERE Time >= '{start_rri}'
         ORDER BY Time DESC LIMIT 100
         '''

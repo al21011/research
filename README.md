@@ -74,3 +74,10 @@ git pull origin integration_test
 ```sh
 git push origin integration_test
 ```
+
+以下は強制的にリモートに合わせるコマンドです。
+
+```sh
+git fetch origin integration_test
+git reset --hard origin/integration_test
+```

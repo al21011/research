@@ -54,16 +54,20 @@ while True:
         if current_time - last_time >= 1:
             db.write_rri_table(time.strftime('%Y-%m-%d %H:%M:%S'), rri_record)
             last_time = current_time
-            # L/Tを再計算 
-            L_T = (culFunc.calculate_axes(db.fetch_rri_table()))
-            print(L_T)
-            # 推定値算出
-            tension = (L_T - 1) * 2.0 / 3.0
-            if tension < 0.0:
-                tension = 0.0
-            elif 2.0 < tension:
-                tension = 2.0
-            print(tension)
+            
+            if len(db.fetch_rri_table()) < 100:
+                tension = None
+            else:
+                # L/Tを再計算 
+                L_T = (culFunc.calculate_axes(db.fetch_rri_table()))
+                print(L_T)
+                # 推定値算出
+                tension = (L_T - 1) * 2.0 / 3.0
+                if tension < 0.0:
+                    tension = 0.0
+                elif 2.0 < tension:
+                    tension = 2.0
+                print(tension)
             db.update_rri_table(time.strftime('%Y-%m-%d %H:%M:%S'), tension)
 
 ser.close()

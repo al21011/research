@@ -11,19 +11,19 @@ import time
 import statistics
 
 # 推定値算出時の基準値から外れた値の影響度
-est_w = 0.3
+est_w = 0.5
 
 # 準備用の関数により得られた値を記入
-pupil_m = 20
-position_m = 14
-blink_m = 20
+pupil_m = 16
+position_m = 16
+blink_m = 25
 
 ### 集中力推定値を書き込む
 def write_estimation() -> float:
     # 各項目の重みを設定
     pupil_w = 0.30
-    position_w = 0.20
-    blink_w = 0.10
+    position_w = 0.05
+    blink_w = 0.30
     
     data = db.fetch_eye_table()
     if not data:
@@ -49,8 +49,8 @@ def write_estimation() -> float:
         blink_cnt = blink_list.count(1)
         
         # 基準値との差を算出する
-        position_dif = position_m - position_cnt
-        blink_dif = blink_m - blink_cnt
+        position_dif = position_m/6 - position_cnt
+        blink_dif = blink_m/6 - blink_cnt
         
         # 重みを考慮して集中具合を算出(0:非集中　1:適切　2:過集中)
         concentration = 1.00 + ((pupil_cnt * pupil_w) + (position_dif * position_w) + (blink_dif * blink_w)) * est_w
@@ -71,9 +71,9 @@ def ref_value():
         pupil_med, position_cnt, blink_cnt = 0, 0, 0
     else:
         # 各カラムについてリストに格納
-        pupil_list = [row[0] for row in data]
-        position_list = [row[1] for row in data]
-        blink_list = [row[2] for row in data]
+        pupil_list = [row[1] for row in data]
+        position_list = [row[2] for row in data]
+        blink_list = [row[3] for row in data]
         
         pupil_med = culFunc.mode_or_median(pupil_list)
         # 脇見回数を記録
@@ -98,13 +98,16 @@ while True:
 '''
 
 # 準備段階で使用
-# print(ref_value())
+print(ref_value())
 
 # 推定値の書き込みを実行
 # 毎秒処理を行う
+
+'''
 last_time = time.time()
 while True:
     current_time = time.time()
     if current_time - last_time >= 1:
         write_estimation()
         last_time = current_time
+'''

@@ -21,9 +21,6 @@ def calculate_axes(returns):
     
     return L/T
 
-### L/Tの計算(参考文献の提案手法のやり方)
-# X座標を変える必要がありそうなので保留
-
 ### CSVファイルに書き込みを行う処理
 def write_to_csv(L_T):
     filename = 'csvFiles/sleep_cal.csv'
